@@ -1,0 +1,235 @@
+/*  Admin  */
+
+.puslapis{
+    display:flex;
+    gap:25px;
+    padding:10px 15px;
+    margin-top:80px;
+    margin-left:30px;
+    margin-right:30px;
+}
+
+.filtras{
+    flex:1;
+    background:white;
+    border:1px solid #d2d8e0;
+    height: fit-content; 
+}
+
+
+
+.duomenys{
+    flex:3;
+    background:white;
+    border:1px solid #d2d8e0;
+    display:flex;
+    flex-direction:column;
+}
+
+.blokas-header{
+padding:12px 15px;
+font-weight:bold;
+color: black;
+}
+
+.turinys{
+margin:5px;
+padding:10px;
+background:#fff;
+}
+
+/* Filtras */
+
+.filtras button{
+width: 100%;
+padding:8px;
+background:#d3a15f;
+border:none;
+cursor:pointer;
+font-size:15px;
+border-radius:4px;
+}
+
+
+
+.filtras label{
+display:block;
+margin-top:5px;
+margin-bottom:6px;
+font-size:15px;
+color:#111;
+}
+
+.filtras input,
+.filtras select{
+width:100%;
+padding:8px;
+margin-bottom:12px;
+border:1px solid #ccc;
+border-radius:4px;
+font-size:14px;
+}
+
+.eilute{
+display:flex;
+gap:10px;
+}
+
+.eilute input{
+flex:1;
+}
+
+.btn-clear{
+display:block;
+width:100%;
+padding:8px;
+background:#ccc;
+color:black;
+text-align:center;
+text-decoration:none;
+border-radius:4px;
+margin-top:10px;
+}
+
+
+
+/* Lentelė */
+
+table{
+width:100%;
+border-collapse:collapse;
+}
+
+th{
+padding:10px;
+text-align:left;
+background: white;
+color:black;
+}
+
+td{
+padding:10px;
+border-bottom:1px solid #ddd;
+color: black;
+}
+
+select{
+width:100%;
+padding:8px;
+margin-bottom:15px;
+}
+
+.pagination {
+    text-align: left;
+	padding:10px;
+	border-top:1px solid #ddd;
+}
+
+.pages{
+    display: inline-block;
+    margin: 5px;
+    padding: 6px 12px;
+    background: #d4a15c;
+    color: black;
+    text-decoration: none;
+    border-radius: 4px;
+}
+
+.pages.active {
+    background: black;
+    color: white;
+}
+
+.btn-action{
+display:inline-block;
+padding:6px 12px;
+background:#d3a15f;
+color:black;
+text-align: center;
+text-decoration:none;
+border-radius:6px;
+font-size:13px;
+margin-right:5px;
+transition:0.2s;
+width: 59px;
+}
+
+
+
+/* --EDIT-- */
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body.edit {
+font-family:Arial, sans-serif;
+background:#111;
+display:flex;
+justify-content:center;
+
+align-items: center;
+    padding-top:30px;
+}
+
+
+.box{
+width:400px;
+background:white;
+padding:20px;
+border-radius:8px;
+border-left:8px solid #d3a15f;
+transform:scale(0.95);
+}
+
+
+.box h2{
+margin-bottom:10px;
+color:#111;
+}
+
+
+.box label{
+display:block;
+margin-top:6px;
+margin-bottom:5px;
+color:#111;
+font-size:14px;
+}
+
+.box input,
+.box select{
+width:100%;
+padding:8px;
+margin-bottom:6px;
+border:1px solid #ccc;
+border-radius:4px;
+}
+
+
+.box button{
+width:100%;
+padding:12px;
+background:#d3a15f;
+border:none;
+border-radius:6px;
+font-weight:bold;
+cursor:pointer;
+margin-top:10px;
+}
+
+.box button:hover{
+opacity:0.9;
+}
+
+
+.cancel{
+display:block;
+text-align:center;
+margin-top:15px;
+text-decoration:none;
+color:#111;
+}
+
+/* --- */

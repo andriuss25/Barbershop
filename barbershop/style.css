@@ -1,0 +1,482 @@
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+html{
+scroll-behavior:smooth;
+}
+
+body{
+font-family:Arial, sans-serif;
+background:#111;
+color:white;
+}
+
+/* VIRŠUTINĖ JUOSTA */
+
+.topbar{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:85px;
+background:rgba(10,10,10,0.95);
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:0 50px;
+z-index:1000;
+}
+
+.logo {
+height: 130px;
+width: auto;
+margin: 0px -40px;
+}
+
+
+
+.menu{
+margin-left: auto;
+display:flex;
+gap:35px;
+align-items:center;
+}
+
+.menu a{
+color:white;
+text-decoration:none;
+font-size:18px;
+transition:0.3s;
+}
+
+
+
+.menu .btn{
+background:#d3a15f;
+color:black;
+padding:14px 26px;
+font-weight:bold;
+border-radius:8px;
+}
+
+/* HERO NUOTRAUKA */
+
+.hero{
+height:100vh;
+background:
+linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)), url("images/main.png");
+background-size:cover;
+background-position:center;
+display:flex;
+align-items:center;
+padding:0 10%;
+margin-top:65px;
+}
+
+.hero-text{
+max-width:700px;
+}
+
+.hero-text a{
+display:block;
+height: 50px;
+width: 250px;
+margin-top: 60px;
+padding:14px 40px;
+font-size:18px;
+text-align: center;
+background:#d3a35f;
+color:black;
+border:none;
+cursor:pointer;
+font-weight: bold;
+text-decoration: none;
+border-radius:8px;
+}
+
+.hero-text h1{
+font-size:72px;
+line-height:1.1;
+font-weight:bold;
+text-transform:uppercase;
+}
+
+/* Blokai */
+
+.content-section{
+background:#111;
+padding:80px 20px;
+}
+
+[id]{
+scroll-margin-top:90px;
+}
+
+.blocks-container{
+max-width:1000px;
+margin:auto;
+}
+
+.info-block{
+background:white;
+color:#111;
+padding:40px;
+margin-bottom:35px;
+border-left:8px solid #d3a15f;
+}
+
+.info-block h2{
+margin-bottom:15px;
+font-size:32px;
+}
+
+.info-block p{
+font-size:18px;
+line-height:1.6;
+}
+
+.about-container{
+display:flex;
+gap:60px;
+background:white;
+color:#111;
+padding:40px;
+margin-bottom:35px;
+border-left:8px solid #d3a15f;
+}
+
+.about-image img{
+width:450px;
+height:auto;
+}
+
+
+.about-text h2{
+padding-top: 30px;
+font-size:48px;
+margin-bottom:25px;
+}
+
+.about-text p{
+padding-top: 30px;
+font-size:18px;
+line-height:1.6;
+margin-bottom:15px;
+}
+
+
+.paslaugos{
+    display:flex;
+    gap:30px;
+}
+
+.paslauga-label {
+text-align:center;
+padding-bottom:20px;
+}
+
+.kortele{
+    width:300px;
+	height: 370px;
+    background:#f3f3f3;
+    padding:20px;
+    text-align:center;
+    border-radius:8px;
+}
+
+.kortele img{
+    width:150px;
+    margin-bottom:15px;
+	margin-top: 20px;
+}
+
+.kortele h3{
+	font-size:25px;
+    margin:15px 0;
+}
+
+.kortele p{
+    font-size:17px;
+}
+
+.kainos-blokas{
+display:flex;
+gap:80px;
+background:white;
+color:#111;
+padding:10px;
+margin-bottom:15px;
+
+}
+
+.kainos-img img{
+    width:450px;
+    margin-bottom:15px;
+	margin-top: 20px;
+}
+
+.kainos h2{
+padding-top: 30px;
+padding-bottom: 30px;
+font-size:48px;
+margin-bottom:25px;
+}
+
+.kainos p{
+padding-top: 10px;
+font-size:18px;
+margin-bottom:5px;
+}
+
+.kaina{
+    display:flex;
+    justify-content:space-between;
+    width:300px;
+}
+
+
+.meistrai h2{
+	text-align:center;
+	margin-bottom: 30px;
+}
+
+.meistru-blokas{
+display:flex;
+gap:25px;
+height: 330px;
+justify-content:center;
+}
+
+.meistras{
+	text-align:center;
+    width:200px;
+    background:#f3f3f3;
+    border-radius:8px;
+    overflow:hidden;
+    padding:0;
+}
+
+.meistras img{
+	width:200px;
+    height:230px;
+    object-fit:cover;
+    border-radius:8px 8px 0 0;
+}
+
+.meistras h3{
+margin-top: 15px;
+
+}
+
+.meistras p{
+margin:10px 0px;
+}
+
+.meistras button{
+padding:8px 15px;
+border:none;
+background:#c79a63;
+color:white;
+cursor:pointer;
+margin-top: 50px;
+border-radius:8px;
+}
+
+.kontaktai{
+padding:20px 5%;
+}
+
+.kontaktai h2{
+margin-bottom:30px;
+}
+
+.kontaktai p{
+margin-bottom:10px;
+font-size:18px;
+}
+
+.map{
+width: 100%;
+height: 300px;
+border: none;
+margin-top: 50px;
+}
+
+
+/*    Pop up    */
+.modal{
+display:none;
+position:fixed;
+top: 0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.7);
+}
+
+.modal:target{
+display:block;
+}
+
+.box{
+background:white;
+width:350px;
+margin: 100px auto;
+padding:20px;
+position:relative;
+border-radius:8px;
+}
+
+.close{
+position:absolute;
+height: 25px;
+width: 35px;
+top:10px;
+right:10px;
+background:#d3a35f;
+color:black;
+padding:5px 10px;
+text-decoration:none;
+text-align:center;
+font-weight:bold;
+border-radius:8px;
+}
+
+.box h2{
+text-align:center;
+color:black;
+margin-bottom:5px;
+
+}
+
+.box label{
+display: block;
+color: black;
+padding-bottom: 5px;
+}
+
+.box select{
+width:100%;
+padding:8px;
+margin-bottom:10px;
+}
+
+.box input{
+width:100%;
+padding:8px;
+margin-bottom:10px;
+}
+
+.box button{
+background:#d3a35f;
+padding:10px;
+border:none;
+width:100%;
+font-weight:bold;
+border-radius:8px;
+}
+
+.data-laikas{
+display:flex;
+gap:10px;
+}
+
+.data-laikas input{
+width:100%;
+}
+
+.zinute {
+    color: green;
+    text-align: center;
+}
+
+
+/* FOOTER */
+
+.footer {
+    width:100%;
+    background: #111;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:15px 40px;
+    border-top:1px solid #ddd;
+}
+
+.footer-left {
+    display:flex;
+    align-items:center;
+    gap:20px;
+}
+
+.footer-logo {
+    height:30px;
+}
+
+.footer-center{
+    display:flex;
+    align-items:center;
+    gap:15px;
+}
+
+.footer-center a{
+    margin: 5px;
+    text-decoration:none;
+    color: white;
+}
+
+.social{
+	height:24px;
+}
+
+.footer-center a:hover{
+    text-decoration:underline;
+}
+
+.footer-right a{
+    margin:0 10px;
+}
+
+/* login */
+
+.login-puslapis{
+	display:flex;
+    gap:25px;
+    padding:10px 15px;
+    margin-top:100px;
+    margin-left:30px;
+    margin-right:30px;
+	height:fit-content;
+}
+
+.login {
+	display:flex; 
+	flex-direction:column; 
+	gap:10px;
+	height:fit-content;
+}
+
+.login label {
+	font-size:18px;
+}
+
+.login input{
+	height: 30px;
+}
+
+.login-button {
+background:#d3a15f;
+color:black;
+margin-top: 20px;
+padding:12px;
+border:none;
+border-radius:8px;
+font-weight:bold;
+cursor:pointer;
+text-align:center;
+}
+
+
