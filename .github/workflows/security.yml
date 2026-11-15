@@ -1,3 +1,4 @@
+
 name: Security Test
 
 on: [push, workflow_dispatch]
@@ -6,6 +7,16 @@ jobs:
   scan:
     runs-on: ubuntu-latest
     container: semgrep/semgrep
+
     steps:
       - uses: actions/checkout@v4
-      - run: semgrep scan --config auto --error .
+
+      - name: Semgrep scan
+        run: semgrep scan --config auto --json --output semgrep-results.json --error .
+
+      - name: Save report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: semgrep-report
+          path: semgrep-results.json
