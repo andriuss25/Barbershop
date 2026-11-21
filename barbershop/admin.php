@@ -10,7 +10,7 @@ require 'config.php';
 
 $limit = 12;
 
-$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
 $start = ($page - 1) * $limit;
 
 ?>
@@ -81,8 +81,8 @@ $start = ($page - 1) * $limit;
 
 					<label>Data: nuo - iki</label>
 						<div class="eilute">
-							<input type="date" name="data_nuo" value="<?php echo isset($_GET['data_nuo']) ? $_GET['data_nuo'] : ''; ?>">
-							<input type="date" name="data_iki" value="<?php echo isset($_GET['data_iki']) ? $_GET['data_iki'] : ''; ?>">
+							<input type="date" name="data_nuo" value="<?php echo htmlspecialchars($_GET['data_nuo'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+							<input type="date" name="data_iki" value="<?php echo htmlspecialchars($_GET['data_iki'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
 						</div>
 
 					<label>Kliento Vardas, pavarde</label>
@@ -122,36 +122,50 @@ $start = ($page - 1) * $limit;
 
 
 			$where = array();
+			$params = array();
+			$types = "";
 
 			if(!empty($_GET['meistras'])){
-				$where[] = "registracijos.meistras_id='".$_GET['meistras']."'";
+				$where[] = "registracijos.meistras_id = ?";
+				$params[] = (int)$_GET['meistras'];
+				$types .= "i";
 			}
 
 			if(!empty($_GET['paslauga'])){
-				$where[] = "registracijos.paslauga_id='".$_GET['paslauga']."'";
+				$where[] = "registracijos.paslauga_id = ?";
+				$params[] = (int)$_GET['paslauga'];
+				$types .= "i";
 			}
 
 			if(!empty($_GET['data_nuo'])){
-				$where[] = "registracijos.data >= '".$_GET['data_nuo']."'";
+				$where[] = "registracijos.data >= ?";
+				$params[] = $_GET['data_nuo'];
+				$types .= "s";
 			}
 
 			if(!empty($_GET['data_iki'])){
-				$where[] = "registracijos.data <= '".$_GET['data_iki']."'";
+				$where[] = "registracijos.data <= ?";
+				$params[] = $_GET['data_iki'];
+				$types .= "s";
 			}
 
 			if(!empty($_GET['klientas'])){
-				$kl = $_GET['klientas'];
-				$where[] = "klientai.vardas LIKE '%".$kl."%'";
+				$where[] = "klientai.vardas LIKE ?";
+				$params[] = "%" . $_GET['klientas'] . "%";
+				$types .= "s";
 			}
 
 			if(count($where) > 0){
 				$sql .= " WHERE " . implode(" AND ", $where);
 			}
 
-			$sql .= " ORDER BY registracijos.id DESC";
-			$sql .= " LIMIT $start, $limit";
+			$sql .= " ORDER BY registracijos.id DESC LIMIT ?, ?";
 
-			$result = mysqli_query($conn,$sql);
+			$stmt = $conn->prepare($sql);
+			$paramsPage = array_merge($params, array($start, $limit));
+			$stmt->bind_param($types . "ii", ...$paramsPage);
+			$stmt->execute();
+			$result = $stmt->get_result();
 
 			echo "<table>";
 
@@ -168,21 +182,23 @@ $start = ($page - 1) * $limit;
 				while($row = mysqli_fetch_assoc($result)){
 
 					echo "<tr>";
-					echo "<td>".$row['data']."</td>";
-					echo "<td>".$row['laikas']."</td>";
-					echo "<td>".$row['klientas']."</td>";
-					echo "<td>".$row['paslauga']."</td>";
-					echo "<td>".$row['meistras']."</td>";
-					echo "<td>".$row['kaina']." €</td>";
+					echo "<td>".htmlspecialchars($row['data'], ENT_QUOTES, 'UTF-8')."</td>";
+					echo "<td>".htmlspecialchars($row['laikas'], ENT_QUOTES, 'UTF-8')."</td>";
+					echo "<td>".htmlspecialchars($row['klientas'], ENT_QUOTES, 'UTF-8')."</td>";
+					echo "<td>".htmlspecialchars($row['paslauga'], ENT_QUOTES, 'UTF-8')."</td>";
+					echo "<td>".htmlspecialchars($row['meistras'], ENT_QUOTES, 'UTF-8')."</td>";
+					echo "<td>".htmlspecialchars($row['kaina'], ENT_QUOTES, 'UTF-8')." €</td>";
 					echo "<td>
-						<a href='edit.php?id=".$row['id']."' class='btn-action'>Edit</a>
-						<a href='delete.php?id=".$row['id']."' class='btn-action'>Delete</a>
+						<a href='edit.php?id=".(int)$row['id']."' class='btn-action'>Edit</a>
+						<a href='delete.php?id=".(int)$row['id']."' class='btn-action'>Delete</a>
 						</td>";
 					echo "</tr>";
 
 				}
 
 			echo "</table>";
+
+			$stmt->close();
 
 			$total_sql = "SELECT COUNT(*) as total
 			FROM registracijos
@@ -192,9 +208,15 @@ $start = ($page - 1) * $limit;
 				$total_sql .= " WHERE " . implode(" AND ", $where);
 			}
 
-			$total_result = mysqli_query($conn, $total_sql);
+			$stmt = $conn->prepare($total_sql);
+			if($types !== ""){
+				$stmt->bind_param($types, ...$params);
+			}
+			$stmt->execute();
+			$total_result = $stmt->get_result();
 			$total_row = mysqli_fetch_assoc($total_result);
 			$total = $total_row['total'];
+			$stmt->close();
 
 			$pages = ceil($total / $limit);
 
