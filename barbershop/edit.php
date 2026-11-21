@@ -1,48 +1,72 @@
 <?php
+session_start();
+if(!isset($_SESSION['loggedin'])){
+	header("Location: login.php");
+	exit;
+}
+
 require 'config.php';
 
+if (isset($_POST['update'])) {
+	$id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
+	$klientas_id = filter_input(INPUT_POST, 'klientas_id', FILTER_VALIDATE_INT);
+	$paslauga = filter_input(INPUT_POST, 'paslauga', FILTER_VALIDATE_INT);
+	$meistras = filter_input(INPUT_POST, 'meistras', FILTER_VALIDATE_INT);
+	$laikas = filter_input(INPUT_POST, 'laikas', FILTER_VALIDATE_INT);
 
-if(isset($_POST['update'])){
+	$vardas = $_POST['vardas'] ?? '';
+	$telefonas = $_POST['telefonas'] ?? '';
+	$email = $_POST['email'] ?? '';
+	$data = $_POST['data'] ?? '';
 
-	$id = $_POST['id'];
-	$klientas_id = $_POST['klientas_id'];
+	if (!$id || !$klientas_id || !$paslauga || !$meistras || !$laikas) {
+		http_response_code(400);
+		exit('Neteisingi registracijos duomenys.');
+	}
 
-	$vardas = $_POST['vardas'];
-	$telefonas = $_POST['telefonas'];
-	$email = $_POST['email'];
+	$stmt = $conn->prepare(
+		"UPDATE klientai SET vardas = ?, telefonas = ?, email = ? WHERE id = ?"
+	);
+	$stmt->bind_param("sssi", $vardas, $telefonas, $email, $klientas_id);
+	$stmt->execute();
+	$stmt->close();
 
-	$paslauga = $_POST['paslauga'];
-	$meistras = $_POST['meistras'];
-	$data = $_POST['data'];
-	$laikas = $_POST['laikas'];
-
-	mysqli_query($conn,"
-	UPDATE klientai 
-	SET vardas='$vardas', telefonas='$telefonas', email='$email'
-	WHERE id='$klientas_id' ");
-
-	mysqli_query($conn,"
-	UPDATE registracijos 
-	SET paslauga_id='$paslauga',
-		meistras_id='$meistras',
-		data='$data',
-		laikas_id='$laikas'
-	WHERE id='$id' ");
+	$stmt = $conn->prepare(
+		"UPDATE registracijos
+		 SET paslauga_id = ?, meistras_id = ?, data = ?, laikas_id = ?
+		 WHERE id = ?"
+	);
+	$stmt->bind_param("iisii", $paslauga, $meistras, $data, $laikas, $id);
+	$stmt->execute();
+	$stmt->close();
 
 	header("Location: admin.php");
 	exit;
 }
 
+$id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 
-$id = $_GET['id'];
+if (!$id) {
+	http_response_code(400);
+	exit('Neteisingas registracijos ID.');
+}
 
-$q = mysqli_query($conn,"
-SELECT registracijos.*, klientai.vardas, klientai.telefonas, klientai.email
-FROM registracijos
-LEFT JOIN klientai ON registracijos.klientas_id = klientai.id
-WHERE registracijos.id='$id' ");
+$stmt = $conn->prepare(
+	"SELECT registracijos.*, klientai.vardas, klientai.telefonas, klientai.email
+	 FROM registracijos
+	 LEFT JOIN klientai ON registracijos.klientas_id = klientai.id
+	 WHERE registracijos.id = ?"
+);
+$stmt->bind_param("i", $id);
+$stmt->execute();
+$q = $stmt->get_result();
+$row = $q->fetch_assoc();
+$stmt->close();
 
-$row = mysqli_fetch_assoc($q);
+if (!$row) {
+	http_response_code(404);
+	exit('Registracija nerasta.');
+}
 ?>
 
 <!DOCTYPE html>
@@ -61,17 +85,17 @@ $row = mysqli_fetch_assoc($q);
 
 		<form method="POST">
 
-			<input type="hidden" name="id" value="<?php echo $row['id']; ?>">
-			<input type="hidden" name="klientas_id" value="<?php echo $row['klientas_id']; ?>">
+			<input type="hidden" name="id" value="<?php echo (int)$row['id']; ?>">
+			<input type="hidden" name="klientas_id" value="<?php echo (int)$row['klientas_id']; ?>">
 
 			<label>Vardas</label>
-			<input type="text" name="vardas" value="<?php echo $row['vardas']; ?>">
+			<input type="text" name="vardas" value="<?php echo htmlspecialchars($row['vardas'], ENT_QUOTES, 'UTF-8'); ?>">
 
 			<label>Telefonas</label>
-			<input type="text" name="telefonas" value="<?php echo $row['telefonas']; ?>">
+			<input type="text" name="telefonas" value="<?php echo htmlspecialchars($row['telefonas'], ENT_QUOTES, 'UTF-8'); ?>">
 
 			<label>El. paštas</label>
-			<input type="email" name="email" value="<?php echo $row['email']; ?>">
+			<input type="email" name="email" value="<?php echo htmlspecialchars($row['email'], ENT_QUOTES, 'UTF-8'); ?>">
 
 			<label>Paslauga</label>
 			<select name="paslauga">
@@ -96,7 +120,7 @@ $row = mysqli_fetch_assoc($q);
 			</select>
 
 			<label>Data</label>
-			<input type="date" name="data" value="<?php echo $row['data']; ?>">
+			<input type="date" name="data" value="<?php echo htmlspecialchars($row['data'], ENT_QUOTES, 'UTF-8'); ?>">
 
 			<label>Laikas</label>
 			<select name="laikas">
