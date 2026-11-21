@@ -6,7 +6,8 @@ if(isset($_POST['vardas']) && isset($_POST['slaptazodis'])){
     $vardas = $_POST['vardas'];
     $slaptazodis = $_POST['slaptazodis'];
 
-    if($vardas == "admin" && $slaptazodis == "1234"){
+	if($vardas == "admin" && $slaptazodis == "1234"){
+        session_regenerate_id(true);
         $_SESSION['loggedin'] = true;
 
         header("Location: admin.php");
