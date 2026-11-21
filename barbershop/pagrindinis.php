@@ -10,37 +10,48 @@ if(isset($_POST['registruoti'])){
 	$telefonas = $_POST["numeris"];
 	$email = $_POST["email"];
 	$data = $_POST["data"];
-	$laikas = $_POST["laikas"];
-	$paslauga = $_POST["paslauga"];
-	$meistras = $_POST["meistras"];
+	$laikas = filter_input(INPUT_POST, 'laikas', FILTER_VALIDATE_INT);
+	$paslauga = filter_input(INPUT_POST, 'paslauga', FILTER_VALIDATE_INT);
+	$meistras = filter_input(INPUT_POST, 'meistras', FILTER_VALIDATE_INT);
 
-	$sql="SELECT * FROM registracijos
-	WHERE data='$data' 
-	AND laikas_id='$laikas'
-	AND meistras_id='$meistras'";
+	$d = DateTime::createFromFormat('Y-m-d', $data);
 
-	$result=mysqli_query($conn,$sql);
+	if(!$laikas || !$paslauga || !$meistras || !$d || $d->format('Y-m-d') !== $data){
+		exit("Neteisingi registracijos duomenys.");
+	}
 
-	if(mysqli_num_rows($result)>0){
+	$stmt = $conn->prepare(
+		"SELECT id FROM registracijos
+		 WHERE data = ? AND laikas_id = ? AND meistras_id = ?"
+	);
+	$stmt->bind_param("sii", $data, $laikas, $meistras);
+	$stmt->execute();
+	$stmt->store_result();
+
+	if($stmt->num_rows > 0){
 		echo "Šis laikas jau užimtas";
 		exit;
 	}
+	$stmt->close();
 
-	$sql = "INSERT INTO klientai (vardas, telefonas, email)
-	VALUES ('$vardas','$telefonas','$email')";
+	$stmt = $conn->prepare(
+		"INSERT INTO klientai (vardas, telefonas, email) VALUES (?, ?, ?)"
+	);
+	$stmt->bind_param("sss", $vardas, $telefonas, $email);
+	$stmt->execute();
+	$klientas_id = $conn->insert_id;
+	$stmt->close();
 
-	mysqli_query($conn,$sql);
-
-	$klientas_id = mysqli_insert_id($conn);
-
-	$sql2 = "INSERT INTO registracijos
-	(paslauga_id, meistras_id, klientas_id, data, laikas_id)
-	VALUES ('$paslauga','$meistras','$klientas_id','$data','$laikas')";
-
-	mysqli_query($conn,$sql2);
+	$stmt = $conn->prepare(
+		"INSERT INTO registracijos (paslauga_id, meistras_id, klientas_id, data, laikas_id)
+		 VALUES (?, ?, ?, ?, ?)"
+	);
+	$stmt->bind_param("iiisi", $paslauga, $meistras, $klientas_id, $data, $laikas);
+	$stmt->execute();
+	$stmt->close();
 
 	$zinute = "Registracija sėkminga";
-	
+
 }
 
 ?>
@@ -299,14 +310,18 @@ if($zinute!=""){
 			<option value="">Pasirinkite meistrą</option>
 
 				<?php
-				$sql="SELECT meistrai.*
-				FROM meistrai
-				JOIN paslauga_meistras
-				ON meistrai.id = paslauga_meistras.meistras_id
-				WHERE paslauga_meistras.paslauga_id='$paslauga'";
+				$paslauga_id = (int)$paslauga;
 
-				$result=mysqli_query($conn,$sql);
-				
+				$stmt = $conn->prepare(
+					"SELECT meistrai.*
+					 FROM meistrai
+					 JOIN paslauga_meistras ON meistrai.id = paslauga_meistras.meistras_id
+					 WHERE paslauga_meistras.paslauga_id = ?"
+				);
+				$stmt->bind_param("i", $paslauga_id);
+				$stmt->execute();
+				$result = $stmt->get_result();
+
 				$meistras="";
 
 				if(isset($_POST['meistras'])){
@@ -318,15 +333,16 @@ if($zinute!=""){
 					if($meistras==$row['id']){
 						$selected="selected";
 					}
-					echo "<option value='".$row['id']."' $selected>".$row['vardas']."</option>";
-
+					echo "<option value='".(int)$row['id']."' $selected>".htmlspecialchars($row['vardas'], ENT_QUOTES, 'UTF-8')."</option>";
 				}
+				$stmt->close();
 				?>
+				
 			</select>
 
 			<label>Data</label>
 			<div class="data-laikas">
-				<input type="date" name="data" value="<?php if(isset($_POST['data'])) echo $_POST['data']; ?>" onchange="this.form.submit()" required>
+				<input type="date" name="data" value="<?php if(isset($_POST['data'])) echo htmlspecialchars($_POST['data'], ENT_QUOTES, 'UTF-8'); ?>" onchange="this.form.submit()" required>
 				<select name="laikas" required>
 				<option value="">Pasirinkite laiką</option>
 					<?php
@@ -338,22 +354,28 @@ if($zinute!=""){
 						
 						$diena = date('w', strtotime($data));
 						if($diena != 0 && $diena != 6){
-						
-							$sql="SELECT *
-							FROM laikai
-							WHERE id NOT IN
-							(
-							SELECT laikas_id
-							FROM registracijos
-							WHERE meistras_id='$meistras'
-							AND data='$data'
-							)";
 
-							$result=mysqli_query($conn,$sql);
+							$meistras_id = (int)$meistras;
+
+							$stmt = $conn->prepare(
+								"SELECT *
+								 FROM laikai
+								 WHERE id NOT IN
+								 (
+									SELECT laikas_id
+									FROM registracijos
+									WHERE meistras_id = ?
+									AND data = ?
+								 )"
+							);
+							$stmt->bind_param("is", $meistras_id, $data);
+							$stmt->execute();
+							$result = $stmt->get_result();
 
 							while($row=mysqli_fetch_assoc($result)){
-								echo "<option value='".$row['id']."'>".$row['laikas']."</option>";
+								echo "<option value='".(int)$row['id']."'>".htmlspecialchars($row['laikas'], ENT_QUOTES, 'UTF-8')."</option>";
 							}
+							$stmt->close();
 						}
 					}
 
