@@ -1,0 +1,18 @@
+rules:
+  - id: custom-request-data-in-sql-condition
+    languages: [php]
+    severity: ERROR
+    mode: taint
+    message: >-
+      Naudotojo duomenys ($_GET/$_POST) jungiami į SQL sąlygą be parametrizavimo.
+      Naudokite paruoštas užklausas su parametrais (?).
+    pattern-sources:
+      - pattern: $_GET[...]
+      - pattern: $_POST[...]
+    pattern-sinks:
+      - patterns:
+          - pattern: $where[] = $EXPR
+          - focus-metavariable: $EXPR
+    pattern-sanitizers:
+      - pattern: (int) ...
+      - pattern: intval(...)
