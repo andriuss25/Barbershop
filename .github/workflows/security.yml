@@ -1,33 +1,23 @@
 name: Security Test
 
-on: [push, workflow_dispatch]
+on: [push, pull_request, workflow_dispatch]
 
 jobs:
   scan:
     runs-on: ubuntu-latest
     container: semgrep/semgrep
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - name: auto
-            config: auto
-          - name: php
-            config: p/php
-          - name: owasp
-            config: p/owasp-top-ten
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Semgrep scan
-        run: semgrep scan --config ${{ matrix.config }} --json-output semgrep-${{ matrix.name }}.json --text-output semgrep-${{ matrix.name }}.txt .
+        run: semgrep scan --config p/php --severity ERROR --text-output semgrep-results.txt --json-output semgrep-results.json --error .
 
       - name: Save report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: semgrep-${{ matrix.name }}
+          name: semgrep-report
           path: |
-            semgrep-${{ matrix.name }}.json
-            semgrep-${{ matrix.name }}.txt
+            semgrep-results.txt
+            semgrep-results.json
