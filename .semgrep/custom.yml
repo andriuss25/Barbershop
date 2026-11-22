@@ -1,0 +1,18 @@
+rules:
+  - id: custom-request-data-in-sql-condition
+    languages: [php]
+    severity: ERROR
+    message: >-
+      Naudotojo duomenys ($_GET/$_POST) jungiami į SQL sąlygą be parametrizavimo.
+      Naudokite paruoštas užklausas su parametrais (?).
+    pattern-either:
+      - pattern: $where[] = "..." . $_GET[...] . "..."
+      - pattern: $where[] = "..." . $_POST[...] . "..."
+      - pattern: |
+          $V = $_GET[...];
+          ...
+          $where[] = "..." . $V . "...";
+      - pattern: |
+          $V = $_POST[...];
+          ...
+          $where[] = "..." . $V . "...";
