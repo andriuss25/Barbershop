@@ -10,8 +10,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Semgrep scan
-        run: semgrep scan --config p/php --severity ERROR --text-output semgrep-results.txt --json-output semgrep-results.json --error .
+      - name: Semgrep scan (p/php)
+        run: semgrep scan --config p/php --severity ERROR --text-output semgrep-php.txt --json-output semgrep-php.json --error .
+
+      - name: Semgrep scan (custom rule)
+        if: always()
+        run: semgrep scan --config .semgrep/custom.yml --text-output semgrep-custom.txt --json-output semgrep-custom.json --error .
 
       - name: Save report
         if: always()
@@ -19,5 +23,7 @@ jobs:
         with:
           name: semgrep-report
           path: |
-            semgrep-results.txt
-            semgrep-results.json
+            semgrep-php.txt
+            semgrep-php.json
+            semgrep-custom.txt
+            semgrep-custom.json
