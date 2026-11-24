@@ -9,10 +9,7 @@ require 'config.php';
 
 $id = (int)($_GET['id'] ?? 0);
 
-$stmt = $conn->prepare("DELETE FROM registracijos WHERE id = ?");
-$stmt->bind_param("i", $id);
-$stmt->execute();
-$stmt->close();
+mysqli_query($conn, "DELETE FROM registracijos WHERE id = '" . $_GET['id'] . "'");
 
 header("Location: admin.php");
 exit;
