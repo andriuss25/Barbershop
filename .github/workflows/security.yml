@@ -5,7 +5,7 @@ on: [push, pull_request, workflow_dispatch]
 jobs:
   scan:
     runs-on: ubuntu-latest
-    container: semgrep/semgrep
+    container: semgrep/semgrep:1.185.0
 
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
